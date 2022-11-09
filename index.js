@@ -26,7 +26,11 @@ rl.question('請輸入URL:', (inputUrl) => {
 });
 
 const selectRegexp = () => {
-    regexp.forEach((v, i) => process.stdout.write(`[${i}] 適用於 ${v.doc}}`))
+    process.stdout.write(`\n目前選項 :` + '\n');
+    regexp.forEach((v, i) => {
+        process.stdout.write(`[${i + 1}] 適用於 ${v.doc} \n`)
+    });
+
     rl.question('請輸入您要的正則表達式(號碼 or 正則表達式)，也可以按Enter 使用自動模式 \n', (inputRegexp) => {
         const index = Number(inputRegexp);
 
@@ -43,7 +47,7 @@ const selectRegexp = () => {
             }
 
         } else if(!isNaN(index) && regexp[index]) {
-            myRegexp = regexp[index].regexp;
+            myRegexp = regexp[index - 1].regexp;
         } else {
             myRegexp = inputRegexp;
         }
