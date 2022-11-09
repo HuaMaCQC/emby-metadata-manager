@@ -1,11 +1,14 @@
 {
-  "name": "rename",
+  "name": "jellyfin-anim-rename",
   "version": "1.0.0",
-  "description": "",
+  "description": "修改動漫檔案名",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^8.27.0"
+  }
 }
