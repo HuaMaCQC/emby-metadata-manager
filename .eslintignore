@@ -1,0 +1,4 @@
+# 不納入eslint
+
+src/proto/*
+vue.config.js

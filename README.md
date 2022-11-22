@@ -1,4 +1,4 @@
-# emby-metadata-manager
+# wanintube-manage
 
 ## Project setup
 ```
