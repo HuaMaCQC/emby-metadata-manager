@@ -30,19 +30,19 @@ const items = ref([
     key: '1',
     label: '中繼資料管理',
     icon: 'pi pi-database',
-    to: '/',
+    to: 'anime_meta_data',
   },
   {
     key: '2',
     label: '風格設定',
     icon: 'pi pi-hashtag',
-    disabled: true,
+    to: 'genre',
   },
   {
     key: '3',
     label: '標籤設定',
     icon: 'pi pi-tag',
-    disabled: true,
+    to: 'tag',
   },
   // { //目前先不要用細項 因為項目不多
   //   key: '4',

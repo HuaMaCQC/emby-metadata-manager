@@ -29,7 +29,7 @@ const routes = [
         path: 'anime_meta_data',
         component: () => import('../views/AnimeMetaData/AnimeMetaData.vue'),
       },
-      // 影片管理 > 影片列表
+      // 風格管理
       {
         path: 'genre',
         component: () => import('../views/Genre/Genre.vue'),

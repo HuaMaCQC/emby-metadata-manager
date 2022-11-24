@@ -11,7 +11,9 @@ const state = {
     name: null,
   },
   isLogin: null,
-  deviceId: localStorage.getItem('deviceId'),
+  deviceId: localStorage.getItem('deviceId') || '',
+  genres: [],
+  tags: [],
 };
 
 export default createStore({

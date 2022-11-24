@@ -14,11 +14,11 @@
 <script setup>
 import { computed, inject } from 'vue';
 import Button from 'primevue/button';
-// import useAjax from '@/utils/useAjax';
+import useAjax from '@/utils/useAjax';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 
-// const { post } = useAjax();
+const { post } = useAjax();
 
 const router = useRouter();
 
@@ -29,14 +29,9 @@ const name = computed(() => store.state.admin.name);
 const { clickMenuFold } = inject('menuState');
 
 const singOut = async () => {
-  // const res = await post('/api/SignOut');
+  await post('/emby/Sessions/Logout');
 
-  // if (res.errCode !== 0) {
-  //   return;
-  // }
-
-  store.commit('isLonin', false);
-  store.dispatch('delToken');
+  store.dispatch('logout');
   router.push({ path: '/login' });
 };
 </script>

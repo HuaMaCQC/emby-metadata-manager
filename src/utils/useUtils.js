@@ -22,6 +22,29 @@ const useUtils = () => {
     return d;
   };
 
+  /**
+   * 深複製
+   *
+   * @param {Object} obj 要複製obj
+   * @returns 複製完的變數
+   */
+  const deepClone = (obj) => {
+    if (obj === null) return null;
+    const clone = { ...obj };
+
+    Object.keys(clone).forEach((key) => {
+      clone[key] = typeof obj[key] === 'object' ? deepClone(obj[key]) : obj[key];
+    });
+
+    if (Array.isArray(obj)) {
+      clone.length = obj.length;
+
+      return Array.from(clone);
+    }
+
+    return clone;
+  };
+
   const getUuid = () => {
     let d = Date.now();
 
@@ -38,7 +61,7 @@ const useUtils = () => {
     });
   };
 
-  return { filterObj, getUuid };
+  return { filterObj, getUuid, deepClone };
 };
 
 export default useUtils;
