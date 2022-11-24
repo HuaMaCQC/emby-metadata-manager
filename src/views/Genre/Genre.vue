@@ -1,13 +1,14 @@
 <template>
   <div class="genre">
-    <DataTable :value="data" showGridlines responsiveLayout="scroll" :resizableColumns="true">
-      <Column field="Name" header="類型名稱"></Column>
-      <Column field="id" header="所屬動漫">
+    <h2>刪除時如果刪太快 可能會造成API 在按一下重整</h2>
+    <Button v-is-Loading="loading" class="p-button-raised p-button-plain" @click="getGenres">重新整理</Button>
+    <DataTable :value="data" responsiveLayout="scroll" :resizableColumns="true">
+      <Column field="name" header="類型名稱"></Column>
+      <Column field="id" header="所屬動漫" class="series-tiems">
         <template #body="slotProps">
-          <div v-for="d in slotProps.item" :key="d.Id">
-            <Chip>{{d.Name}}</Chip>
+          <div v-for="item in slotProps.data.seriesTiems" :key="item.id">
+            <Chip v-is-Loading="loading" removable @remove="() => remove(item.id, slotProps.data.name)">{{ item.name }}</Chip>
           </div>
-
         </template>
       </Column>
       <Column field="id" header="操作">
@@ -23,62 +24,129 @@
 
 <script setup>
 import useAjax from '@/utils/useAjax';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import { useStore } from 'vuex';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
 import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from 'primevue/usetoast';
-// eslint-disable-next-line no-unused-vars
 import Chip from 'primevue/chip';
+import vIsLoading from '@/utils/vIsLoading';
 
-const { get } = useAjax();
+// eslint-disable-next-line no-unused-vars
+const { get, post } = useAjax();
 const store = useStore();
 const total = ref(0);
 const data = ref([]);
 const confirm = useConfirm();
 const toast = useToast();
+const loading = ref(false);
+const mySeriesTiems = ref([]);
+const user = computed(() => store.state.user);
 
 const getGenres = async () => {
+  loading.value = true;
+  const ItemsRes = await get('/emby/Items', {
+    IncludeItemTypes: 'Series',
+    Recursive: 'true',
+    Fields: 'Genres,Tags,BasicSyncInfo',
+  });
+
+  if (!ItemsRes || !ItemsRes.Items) {
+    toast.add({ severity: 'error', detail: '載入錯誤 如果發生太多次請通知花媽謝謝!', life: 3000 });
+
+    return;
+  }
+
+  mySeriesTiems.value = ItemsRes.Items;
+
   const res = await get('/emby/Genres', {
     IncludeItemTypes: 'Series',
     Fields: 'Series',
     Recursive: 'true',
   });
 
+  loading.value = false;
+
   if (res && Array.isArray(res.Items)) {
     store.commit('setGenres', res.Items);
     total.value = res.TotalRecordCount;
-    data.value = res.Items;
+    const items = ItemsRes.Items;
+    data.value = res.Items.map((g) => {
+      const seriesTiems = items
+        .filter((item) => item.GenreItems.find((s) => s.Id.toString() === g.Id.toString()))
+        .map((item) => ({ id: item.Id, name: item.Name }));
+
+      return { name: g.Name, id: g.Id, seriesTiems };
+    });
   }
 };
 
-const getSeries = async () => {
-  const res = await get('/emby/Items', {
+const getSeriesItem = async (id) => {
+  console.log(id);
+  console.log(user.value.id);
+  const res = await get(`/emby/Users/${user.value.id}/Items/${id}`);
+
+  return {
+    CommunityRating: res.CommunityRating, // 論壇評分 通常由爬蟲取得
+    CriticRating: res.CriticRating, // 評論家評分 通常無資料
+    DateCreated: res.DateCreated, // 創建日期
+    DisplayOrder: res.DisplayOrder,
+    EndDate: res.EndDate, // 播完時間
+    ForcedSortName: res.ForcedSortName, // 排序名稱
+    Genres: res.Genres,
+    Id: res.Id,
+    LockData: res.LockData, // 大鎖
+    LockedFields: res.LockedFields, // 小鎖
+    Name: res.Name,
+    OriginalTitle: res.OriginalTitle, // 原始標題 爬蟲爬到的標題
+    OfficialRating: res.OfficialRating, // 官方評級 通常由爬蟲取得
+    CustomRating: res.CustomRating, // 自定義分級 通常無資料
+    Overview: res.Overview, // 介紹
+    People: res.People,
+    PreferredMetadataCountryCode: res.PreferredMetadataCountryCode || '', // 首選元數據國家代碼
+    PreferredMetadataLanguage: res.PreferredMetadataLanguage || '', // 首選元數據語言
+    PremiereDate: res.PremiereDate, // 首映日期
+    ProductionYear: res.ProductionYear, // 生產年份
+    ProviderIds: res.ProviderIds, // 爬蟲識別碼 建議直接回傳部要更改
+    RunTimeTicks: res.RunTimeTicks, // 運行時間 微秒 不知道幹啥用的
+    Status: res.Status, // 目前狀態
+    Studios: res.Studios, // 製作廠商
+    Tags: res.Tags, // 需與 TagItems一樣
+    TagItems: res.TagItems.map((v) => ({ Name: v.Name })), // 與Tags 一樣一起發
+    SortName: res.SortName, // 排序時間
+    Taglines: res.Taglines, // 品牌理念 用來自訂意訊息
+  };
+};
+
+// eslint-disable-next-line no-unused-vars
+const remove = async (vid, gName) => {
+  loading.value = true;
+
+  let newData = await getSeriesItem(vid);
+
+  newData = {
+    ...newData,
+    Genres: newData.Genres.filter((v) => v !== gName),
+  };
+
+  await post(`/emby/Items/${vid}`, newData, { reqformat: 'json' });
+
+  const ItemsRes = await get('/emby/Items', {
     IncludeItemTypes: 'Series',
     Recursive: 'true',
     Fields: 'Genres,Tags,BasicSyncInfo',
   });
 
-  if (res && res.Items) {
-    data.value.forEach((d, i) => {
-      data.value[i].item = [];
-      res.Items.forEach((series) => {
-        if (series.GenreItems.find((s) => s.Id.toString() === d.Id.toString())) {
-          data.value[i].item.push({
-            Id: series.Id,
-            Name: series.Name,
-          });
-        }
-      });
-    });
-  }
-};
+  if (!ItemsRes || !ItemsRes.Items) {
+    toast.add({ severity: 'error', detail: '載入錯誤 如果發生太多次請通知花媽謝謝!', life: 3000 });
 
-// eslint-disable-next-line no-unused-vars
-const remove = async (vid, gid) => {
-  console.log(vid, gid);
+    return;
+  }
+
+  mySeriesTiems.value = ItemsRes.Items;
+  loading.value = false;
 };
 
 const delAll = async (d) => {
@@ -94,12 +162,20 @@ const delAll = async (d) => {
 };
 
 onMounted(() => {
-  getGenres().then(() => getSeries());
+  getGenres();
 });
 </script>
 
 <style lang="scss" scoped>
 .genre {
   height: 100%;
+  ::v-deep(.series-tiems) {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    .p-chip {
+      margin-right: 10px;
+    }
+  }
 }
 </style>

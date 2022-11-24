@@ -17,7 +17,8 @@ const useAjax = () => {
 
   const { getUuid } = useUtils();
   const deviceId = computed(() => store.state.deviceId);
-  const accessToken = computed(() => store.state.token.accessToken);
+  const user = computed(() => store.state.user);
+
   const userAgent = computed(() => {
     let agent = '';
 
@@ -83,40 +84,8 @@ const useAjax = () => {
     return agent;
   });
 
-  // 加上Token
-  axios.interceptors.request.use((_config) => {
-    const req = _config;
-
-    if (!deviceId.value) {
-      store.dispatch('setDeviceId', getUuid());
-    }
-
-    req.params = {
-      'X-Emby-Device-Id': deviceId.value,
-      'X-Emby-Client-Version': config.Client_Version,
-      'X-Emby-Client': config.Client,
-      'X-Emby-Device-Name': userAgent.value,
-      ...req.params,
-    };
-
-    if (accessToken.value) {
-      req.params['X-Emby-Token'] = accessToken.value;
-    }
-
-    return req;
-  }, (error) => Promise.reject(error));
-
   // 處理錯誤
   const responseError = (error) => {
-    // const { status, statusText } = error.response;
-
-    // if (status === 401) {
-    //   router.push({ path: '/login' });
-    //   toast.add({ severity: 'error', detail: '帳號密碼錯誤', life: 3000 });
-
-    //   return;
-    // }
-
     toast.add({ severity: 'error', detail: '您帳密錯誤或伺服器錯誤! 如果持續錯誤請告訴花媽 不要一直玩!', life: 3000 });
     Promise.reject(error);
   };
@@ -129,12 +98,30 @@ const useAjax = () => {
    * @param {*} params params
    * @returns 回傳資料
    */
-  const post = (api, req, params = {}) => axios
-    .post(api, { ...req }, { params })
-    .then((d) => Promise.resolve(d.data))
-    .catch((err) => {
-      responseError(err);
-    });
+  const post = (api, req, _params = {}) => {
+    if (!deviceId.value) {
+      store.dispatch('setDeviceId', getUuid());
+    }
+
+    const params = {
+      'X-Emby-Device-Id': deviceId.value,
+      'X-Emby-Client-Version': config.Client_Version,
+      'X-Emby-Client': config.Client,
+      'X-Emby-Device-Name': userAgent.value,
+      ..._params,
+    };
+
+    if (user.value && user.value.token) {
+      params['X-Emby-Token'] = user.value.token;
+    }
+
+    return axios
+      .post(api, { ...req }, { params })
+      .then((d) => Promise.resolve(d.data))
+      .catch((err) => {
+        responseError(err);
+      });
+  };
 
   /**
    * ajax get
@@ -142,29 +129,32 @@ const useAjax = () => {
    * @param {string} api api
    * @returns 回傳資料
    */
-  const get = (api, req) => axios.get(api, { params: { ...req } })
-    .then((d) => Promise.resolve(d.data))
-    .catch((err) => {
-      responseError(err);
-    });
+  const get = (api, req) => {
+    if (!deviceId.value) {
+      store.dispatch('setDeviceId', getUuid());
+    }
 
-  /**
-   * ajax put
-   *
-   * @param {string} api api
-   * @param {*} req 查詢資料
-   * @param {*} params params
-   * @returns 回傳資料
-   */
-  const put = (api, req, params = {}) => axios
-    .put(api, { ...req }, { params })
-    .then((d) => Promise.resolve(d.data))
-    .catch((err) => {
-      responseError(err);
-    });
+    const params = {
+      'X-Emby-Device-Id': deviceId.value,
+      'X-Emby-Client-Version': config.Client_Version,
+      'X-Emby-Client': config.Client,
+      'X-Emby-Device-Name': userAgent.value,
+      ...req,
+    };
+
+    if (user.value && user.value.token) {
+      params['X-Emby-Token'] = user.value.token;
+    }
+
+    return axios.get(api, { params })
+      .then((d) => Promise.resolve(d.data))
+      .catch((err) => {
+        responseError(err);
+      });
+  };
 
   return {
-    get, post, put,
+    get, post,
   };
 };
 

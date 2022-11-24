@@ -1,17 +1,5 @@
 import useUitls from '@/utils/useUtils';
 
-export const receiveToken = (state, messages) => {
-  if (!messages.accessToken || typeof messages.accessToken !== 'string') {
-    console.error('錯誤操作');
-
-    return;
-  }
-
-  state.token = {
-    accessToken: messages.accessToken,
-  };
-};
-
 export const receiveDeviceId = (state, messages) => {
   if (!messages || typeof messages !== 'string') {
     console.error('錯誤操作');
@@ -22,14 +10,13 @@ export const receiveDeviceId = (state, messages) => {
   state.deviceId = messages;
 };
 
-export const receiveAdmin = (state, messages) => {
-  if (typeof messages !== 'object') {
-    console.error('錯誤操作');
-    return;
-  }
+export const receiveUser = (state, messages) => {
+  console.log(messages?.token, '設定的token');
 
-  state.admin = {
-    name: messages.name !== undefined ? messages.name : state.admin.name,
+  state.user = {
+    id: messages?.id,
+    token: messages?.token,
+    name: messages?.name,
   };
 };
 

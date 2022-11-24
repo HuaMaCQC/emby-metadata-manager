@@ -3,15 +3,14 @@ import * as actions from './actions';
 import * as mutations from './mutations';
 
 const state = {
-  token: {
-    accessToken: localStorage.getItem('acctoken') || '',
-  },
   // 管理員資訊
-  admin: {
+  user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : {
+    token: null,
+    id: null,
     name: null,
   },
-  isLogin: null,
   deviceId: localStorage.getItem('deviceId') || '',
+  isLogin: null,
   genres: [],
   tags: [],
 };

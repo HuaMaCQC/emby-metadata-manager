@@ -61,13 +61,10 @@ const disabledSubmit = computed(
 const clickLogin = async () => {
   loading.value = true;
 
-  const res = await post(
-    '/emby/Users/authenticatebyname',
-    {
-      Username: account.value,
-      Pw: password.value,
-    },
-  );
+  const res = await post('/emby/Users/authenticatebyname', {
+    Username: account.value,
+    Pw: password.value,
+  });
 
   loading.value = false;
 
@@ -78,7 +75,7 @@ const clickLogin = async () => {
   }
 
   // store.commit('receiveAdmin', { name: res.loginResult.admin.name });
-  store.dispatch('login', res.AccessToken);
+  store.dispatch('login', { token: res.AccessToken, user: res.User });
   router.push({ path: '/' });
 };
 </script>

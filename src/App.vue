@@ -19,20 +19,11 @@ import zh from '@/locale/primeVue.zh-tw.json';
 // const { get } = useAjax();
 const router = useRouter();
 const store = useStore();
-const token = computed(() => store.state.token.accessToken);
+const user = computed(() => store.state.user);
 const primevue = usePrimeVue();
 
 const getLoginData = async () => {
-  if (token.value) {
-    // const res = await get('/api/GetLoginData');
-
-    // if (res.errCode !== 0) {
-    //   store.commit('isLonin', false);
-    //   router.push('/login');
-    //   return;
-    // }
-
-    // store.commit('receiveAdmin', { name: res.loginResult.admin.name });
+  if (user.value && user.value.token && user.value.id) {
     store.commit('isLonin', true);
 
     return;

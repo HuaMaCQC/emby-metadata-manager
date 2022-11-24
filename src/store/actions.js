@@ -6,18 +6,22 @@ export const setDeviceId = ({ commit }, id) => {
 
 // 登出
 export const logout = ({ commit }) => {
-  localStorage.removeItem('acctoken');
+  localStorage.removeItem('user');
 
-  commit('receiveToken', { accessToken: '' });
-  commit('isLonin', false);
+  commit('receiveUser', { id: null, name: null, token: null });
 };
 
 // 登入
-export const login = ({ commit }, token) => {
-  localStorage.setItem('acctoken', token);
+export const login = ({ commit }, { user, token }) => {
+  const json = JSON.stringify({
+    token,
+    id: user.Id,
+    name: user.Name,
+  });
+
+  localStorage.setItem('user', json);
 
   if (token) {
-    commit('receiveToken', { accessToken: token });
-    commit('isLonin', true);
+    commit('receiveUser', { ...user, token });
   }
 };

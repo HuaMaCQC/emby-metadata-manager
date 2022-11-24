@@ -24,7 +24,7 @@ const router = useRouter();
 
 const store = useStore();
 
-const name = computed(() => store.state.admin.name);
+const name = computed(() => store.state.user.name);
 
 const { clickMenuFold } = inject('menuState');
 
