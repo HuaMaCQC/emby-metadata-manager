@@ -1,23 +1,31 @@
 <template>
   <div class="genre">
-    <h2>刪除時如果刪太快 可能會造成API 在按一下重整</h2>
-    <Button v-is-Loading="loading" class="p-button-raised p-button-plain" @click="getGenres">重新整理</Button>
-    <DataTable :value="data" responsiveLayout="scroll" :resizableColumns="true">
+    <h4>刪除完成請 按一下重整! 確認一下</h4>
+    <Button v-is-Loading="loading" class="p-button-raised btn p-button-plain" @click="getGenres">重新整理</Button>
+    <DataTable :value="data" responsiveLayout="scroll" :resizableColumns="true" :autoLayout="true" :scrollable="false">
       <Column field="name" header="類型名稱"></Column>
-      <Column field="id" header="所屬動漫" class="series-tiems">
+      <Column field="id" header="所屬動漫">
         <template #body="slotProps">
-          <div v-for="item in slotProps.data.seriesTiems" :key="item.id">
-            <Chip v-is-Loading="loading" removable @remove="() => remove(item.id, slotProps.data.name)">{{ item.name }}</Chip>
+          <div class="series-tiems">
+            <div v-for="item in slotProps.data.seriesTiems" :key="item.id">
+              <Chip v-is-Loading="loading" removable @remove="() => remove(item.id, slotProps.data.name)">{{ item.name
+              }}</Chip>
+            </div>
           </div>
+
         </template>
       </Column>
       <Column field="id" header="操作">
         <template #body="slotProps">
-          <Button class="p-button-raised p-button-text p-button-plain p-button-sm" @click="() => delAll(slotProps.data)">全部刪除</Button>
+          <Button class="p-button-raised p-button-text p-button-plain p-button-sm"
+            @click="() => delAll(slotProps.data)">全部刪除</Button>
         </template>
       </Column>
-
-      <template #footer>總筆數: {{ total }}</template>
+      <template  #footer>
+        <div class="footer">
+          總筆數: {{ total }}
+        </div>
+      </template>
     </DataTable>
   </div>
 </template>
@@ -84,8 +92,6 @@ const getGenres = async () => {
 };
 
 const getSeriesItem = async (id) => {
-  console.log(id);
-  console.log(user.value.id);
   const res = await get(`/emby/Users/${user.value.id}/Items/${id}`);
 
   return {
@@ -151,12 +157,12 @@ const remove = async (vid, gName) => {
 
 const delAll = async (d) => {
   confirm.require({
-    message: `你確定刪除 [ ${d.Name} ] 風格嗎? 刪除後無法恢復喔!`,
+    message: `你確定刪除 [ ${d.name} ] 風格嗎? 刪除後無法恢復喔!`,
     header: '刪除風格',
     icon: 'pi pi-info-circle',
     acceptClass: 'p-button-danger',
     accept: () => {
-      toast.add({ severity: 'info', summary: 'Confirmed', detail: '此功能還沒有做好抱歉!', life: 3000 });
+      toast.add({ severity: 'error', summary: '通知', detail: '此功能還沒有做好抱歉! 等我有空再說', life: 3000 });
     },
   });
 };
@@ -169,13 +175,23 @@ onMounted(() => {
 <style lang="scss" scoped>
 .genre {
   height: 100%;
+
+  ::v-deep(.btn) {
+    margin-bottom: 10px;
+  }
+
   ::v-deep(.series-tiems) {
     display: flex;
-    flex-direction: row;
     height: 100%;
+    flex-wrap: wrap;
     .p-chip {
       margin-right: 10px;
+      margin-top: 10px;
     }
+  }
+
+  .footer{
+    text-align: center;
   }
 }
 </style>

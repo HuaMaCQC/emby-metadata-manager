@@ -12,7 +12,7 @@ export const logout = ({ commit }) => {
 };
 
 // 登入
-export const login = ({ commit }, { user, token }) => {
+export const login = ({ commit }, { token, user }) => {
   const json = JSON.stringify({
     token,
     id: user.Id,
@@ -22,6 +22,10 @@ export const login = ({ commit }, { user, token }) => {
   localStorage.setItem('user', json);
 
   if (token) {
-    commit('receiveUser', { ...user, token });
+    commit('receiveUser', {
+      id: user.Id,
+      name: user.Name,
+      token,
+    });
   }
 };
