@@ -1,30 +1,35 @@
 <template>
   <div class="genre">
-    <h4>刪除完成請 按一下重整! 確認一下</h4>
-    <Button v-is-Loading="loading" class="p-button-raised btn p-button-plain" @click="getGenres">重新整理</Button>
+    <Button
+      v-is-Loading="loading"
+      class="p-button-raised btn p-button-plain"
+      :disabled="loading"
+      @click="getGenres">重新整理</Button>
     <DataTable :value="data" responsiveLayout="scroll" :resizableColumns="true" :autoLayout="true" :scrollable="false">
-      <Column field="name" header="類型名稱"></Column>
-      <Column field="id" header="所屬動漫">
+      <Column field="name" header="名稱"></Column>
+      <Column field="id" header="包含動漫">
         <template #body="slotProps">
           <div class="series-tiems">
             <div v-for="item in slotProps.data.seriesTiems" :key="item.id">
-              <Chip v-is-Loading="loading" removable @remove="() => remove(item.id, slotProps.data.name)">{{ item.name
-              }}</Chip>
+              <Chip v-is-Loading="loading"
+              :removable="!loading"
+              @remove="() => remove(item.id, slotProps.data.name)">
+              {{ item.name }}</Chip>
             </div>
           </div>
-
         </template>
       </Column>
       <Column field="id" header="操作">
         <template #body="slotProps">
-          <Button class="p-button-raised p-button-text p-button-plain p-button-sm"
+          <Button
+            v-is-Loading="loading"
+            class="p-button-raised p-button-text p-button-plain p-button-sm"
+            :disabled="loading"
             @click="() => delAll(slotProps.data)">全部刪除</Button>
         </template>
       </Column>
-      <template  #footer>
-        <div class="footer">
-          總筆數: {{ total }}
-        </div>
+      <template #footer>
+        <div class="footer">總筆數: {{ total }}</div>
       </template>
     </DataTable>
   </div>
@@ -42,7 +47,6 @@ import { useToast } from 'primevue/usetoast';
 import Chip from 'primevue/chip';
 import vIsLoading from '@/utils/vIsLoading';
 
-// eslint-disable-next-line no-unused-vars
 const { get, post } = useAjax();
 const store = useStore();
 const total = ref(0);
@@ -62,7 +66,7 @@ const getGenres = async () => {
   });
 
   if (!ItemsRes || !ItemsRes.Items) {
-    toast.add({ severity: 'error', detail: '載入錯誤 如果發生太多次請通知花媽謝謝!', life: 3000 });
+    toast.add({ severity: 'error', summary: '載入錯誤', detail: '如果發生太多次請通知花媽謝謝!', life: 3000 });
 
     return;
   }
@@ -81,6 +85,7 @@ const getGenres = async () => {
     store.commit('setGenres', res.Items);
     total.value = res.TotalRecordCount;
     const items = ItemsRes.Items;
+
     data.value = res.Items.map((g) => {
       const seriesTiems = items
         .filter((item) => item.GenreItems.find((s) => s.Id.toString() === g.Id.toString()))
@@ -126,9 +131,10 @@ const getSeriesItem = async (id) => {
   };
 };
 
-// eslint-disable-next-line no-unused-vars
-const remove = async (vid, gName) => {
-  loading.value = true;
+const remove = async (vid, gName, { showToast = true, setLoading = true }) => {
+  if (setLoading) {
+    loading.value = true;
+  }
 
   let newData = await getSeriesItem(vid);
 
@@ -137,22 +143,21 @@ const remove = async (vid, gName) => {
     Genres: newData.Genres.filter((v) => v !== gName),
   };
 
-  await post(`/emby/Items/${vid}`, newData, { reqformat: 'json' });
+  await post(`/emby/Items/${vid}`, newData, { reqformat: 'json' })
+    .then(() => {
+      if (showToast) {
+        toast.add({ severity: 'success', summary: '刪除完成', detail: '請按一下重整! 確認一下!', life: 1000 });
+      }
+    })
+    .catch(() => {
+      if (showToast) {
+        toast.add({ severity: 'error', summary: '刪除失敗!', detail: '請重整後再次確認', life: 3000 });
+      }
+    });
 
-  const ItemsRes = await get('/emby/Items', {
-    IncludeItemTypes: 'Series',
-    Recursive: 'true',
-    Fields: 'Genres,Tags,BasicSyncInfo',
-  });
-
-  if (!ItemsRes || !ItemsRes.Items) {
-    toast.add({ severity: 'error', detail: '載入錯誤 如果發生太多次請通知花媽謝謝!', life: 3000 });
-
-    return;
+  if (setLoading) {
+    loading.value = false;
   }
-
-  mySeriesTiems.value = ItemsRes.Items;
-  loading.value = false;
 };
 
 const delAll = async (d) => {
@@ -162,7 +167,20 @@ const delAll = async (d) => {
     icon: 'pi pi-info-circle',
     acceptClass: 'p-button-danger',
     accept: () => {
-      toast.add({ severity: 'error', summary: '通知', detail: '此功能還沒有做好抱歉! 等我有空再說', life: 3000 });
+      loading.value = true;
+      const myRemoves = [];
+      for (let i = 0; i < d.seriesTiems.length; i += 1) {
+        myRemoves.push(remove(d.seriesTiems[i].id, d.name, { showToast: false, setLoading: false }));
+      }
+
+      Promise.all(myRemoves).then(async () => {
+        await getGenres();
+        toast.add({ severity: 'success', summary: '刪除完畢', life: 3000 });
+      }).catch(() => {
+        toast.add({ severity: 'error', summary: '刪除失敗', detail: '請重整後再次確認', life: 3000 });
+      }).finally(() => {
+        loading.value = false;
+      });
     },
   });
 };
@@ -190,7 +208,7 @@ onMounted(() => {
     }
   }
 
-  .footer{
+  .footer {
     text-align: center;
   }
 }

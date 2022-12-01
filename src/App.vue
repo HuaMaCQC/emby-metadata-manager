@@ -14,9 +14,7 @@ import { computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import { usePrimeVue } from 'primevue/config';
 import zh from '@/locale/primeVue.zh-tw.json';
-// import useAjax from './utils/useAjax';
 
-// const { get } = useAjax();
 const router = useRouter();
 const store = useStore();
 const user = computed(() => store.state.user);
@@ -49,9 +47,6 @@ body {
   overflow: overlay;
   padding-right: 1rem;
 
-  &::-webkit-scrollbar {
-    // width: 7px;
-  }
   &::-webkit-scrollbar-button {
     background: transparent;
     border-radius: 4px;
