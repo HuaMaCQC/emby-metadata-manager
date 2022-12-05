@@ -1,8 +1,6 @@
-/* eslint-disable no-unused-vars */
 import axios from 'axios';
 import { useStore } from 'vuex';
 import { useToast } from 'primevue/usetoast';
-import { useRouter } from 'vue-router';
 import useUtils from '@/utils/useUtils';
 import config from '@/config';
 import { computed } from 'vue';
@@ -13,7 +11,6 @@ const useAjax = () => {
   axios.defaults.timeout = '45000';
   const store = useStore();
   const toast = useToast();
-  const router = useRouter();
 
   const { getUuid } = useUtils();
   const deviceId = computed(() => store.state.deviceId);
@@ -153,8 +150,42 @@ const useAjax = () => {
       });
   };
 
+  const getSeriesItem = async (id) => {
+    const res = await get(`/emby/Users/${user.value.id}/Items/${id}`);
+
+    return {
+      CommunityRating: res.CommunityRating, // 論壇評分 通常由爬蟲取得
+      CriticRating: res.CriticRating, // 評論家評分 通常無資料
+      DateCreated: res.DateCreated, // 創建日期
+      DisplayOrder: res.DisplayOrder,
+      EndDate: res.EndDate, // 播完時間
+      ForcedSortName: res.ForcedSortName, // 排序名稱
+      Genres: res.Genres,
+      Id: res.Id,
+      LockData: res.LockData, // 大鎖
+      LockedFields: res.LockedFields, // 小鎖
+      Name: res.Name,
+      OriginalTitle: res.OriginalTitle, // 原始標題 爬蟲爬到的標題
+      OfficialRating: res.OfficialRating, // 官方評級 通常由爬蟲取得
+      CustomRating: res.CustomRating, // 自定義分級 通常無資料
+      Overview: res.Overview, // 介紹
+      People: res.People,
+      PreferredMetadataCountryCode: res.PreferredMetadataCountryCode || '', // 首選元數據國家代碼
+      PreferredMetadataLanguage: res.PreferredMetadataLanguage || '', // 首選元數據語言
+      PremiereDate: res.PremiereDate, // 首映日期
+      ProductionYear: res.ProductionYear, // 生產年份
+      ProviderIds: res.ProviderIds, // 爬蟲識別碼 建議直接回傳部要更改
+      RunTimeTicks: res.RunTimeTicks, // 運行時間 微秒 不知道幹啥用的
+      Status: res.Status, // 目前狀態
+      Studios: res.Studios, // 製作廠商
+      Tags: res.TagItems.map((t) => t.Name), // 需與 TagItems一樣
+      SortName: res.SortName, // 排序時間
+      Taglines: res.Taglines, // 品牌理念 用來自訂意訊息
+    };
+  };
+
   return {
-    get, post,
+    get, post, getSeriesItem,
   };
 };
 

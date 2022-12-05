@@ -26,8 +26,13 @@ const routes = [
       },
       // 動漫 => 中繼資料管理
       {
-        path: 'anime_meta_data',
-        component: () => import('../views/AnimeMetaData/AnimeMetaData.vue'),
+        path: 'genre-tag-metadata',
+        component: () => import('../views/GenreTagMetadata/GenreTagMetadata.vue'),
+      },
+      // 簡介編輯
+      {
+        path: 'info',
+        component: () => import('../views/info/info.vue'),
       },
       // 風格管理
       {
