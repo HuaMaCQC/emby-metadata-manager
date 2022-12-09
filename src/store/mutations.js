@@ -20,6 +20,10 @@ export const receiveUser = (state, messages) => {
   };
 };
 
+export const receiveSetting = (state, messages) => {
+  state.setting = messages;
+};
+
 export const setGenres = (state, messages) => {
   if (!Array.isArray(messages)) {
     console.error('錯誤操作');

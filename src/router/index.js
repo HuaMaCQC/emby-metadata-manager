@@ -39,6 +39,11 @@ const routes = [
         path: 'genre',
         component: () => import('../views/Genre/Genre.vue'),
       },
+      // 單集
+      {
+        path: 'episodes',
+        component: () => import('../views/Episodes/Episodes.vue'),
+      },
     ],
   },
 ];

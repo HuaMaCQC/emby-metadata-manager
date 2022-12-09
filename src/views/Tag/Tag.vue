@@ -2,7 +2,7 @@
   <div class="tag">
     <Button
       v-is-Loading="loading"
-      class="p-button-raised btn p-button-plain"
+      class="btn p-button-raised p-button-plain"
       :disabled="loading"
       @click="getTags">重新整理</Button>
     <DataTable :value="data" responsiveLayout="scroll" :resizableColumns="true" :autoLayout="true" :scrollable="false">
@@ -161,7 +161,7 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.Tag {
+.tag {
   height: 100%;
 
   ::v-deep(.btn) {

@@ -37,29 +37,29 @@ onMounted(() => {
 });
 </script>
 <style lang="scss">
-#app {
-  font-family: Papyrus, Verdana, Comic Sans MS ;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+// #app {
+//   font-family: Papyrus, Verdana, Comic Sans MS ;
+//   -webkit-font-smoothing: antialiased;
+//   -moz-osx-font-smoothing: grayscale;
+// }
 
-body {
-  overflow: overlay;
-  padding-right: 1rem;
+// body {
+//   overflow: overlay;
+//   padding-right: 1rem;
 
-  &::-webkit-scrollbar-button {
-    background: transparent;
-    border-radius: 4px;
-  }
-  &::-webkit-scrollbar-track-piece {
-    background: transparent;
-  }
-  &::-webkit-scrollbar-thumb {
-    border-radius: 4px;
-    background-color: rgb(0, 0, 0, 0.2);
-  }
-  &::-webkit-scrollbar-track {
-    box-shadow: transparent;
-  }
-}
+//   &::-webkit-scrollbar-button {
+//     background: transparent;
+//     border-radius: 4px;
+//   }
+//   &::-webkit-scrollbar-track-piece {
+//     background: transparent;
+//   }
+//   &::-webkit-scrollbar-thumb {
+//     border-radius: 4px;
+//     background-color: rgb(0, 0, 0, 0.2);
+//   }
+//   &::-webkit-scrollbar-track {
+//     box-shadow: transparent;
+//   }
+// }
 </style>

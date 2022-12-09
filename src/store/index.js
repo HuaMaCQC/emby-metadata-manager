@@ -9,6 +9,9 @@ const state = {
     id: null,
     name: null,
   },
+  setting: localStorage.getItem('setting') ? JSON.parse(localStorage.getItem('setting')) : {
+    genreTagMetadataShowAll: true,
+  },
   deviceId: localStorage.getItem('deviceId') || '',
   isLogin: null,
   genres: [],

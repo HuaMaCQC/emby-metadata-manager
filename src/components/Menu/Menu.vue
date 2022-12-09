@@ -64,6 +64,12 @@ const items = ref([
     icon: 'pi pi-tag',
     to: 'tag',
   },
+  {
+    key: '7',
+    label: '動漫單集管理',
+    icon: 'pi pi-vimeo',
+    to: 'episodes',
+  },
   // { //目前先不要用細項 因為項目不多
   //   key: '4',
   //   label: '後臺帳號管理',
@@ -114,106 +120,105 @@ const items = ref([
       }
     }
   }
-}
 
-// menu縮排
-.menu-fold:not(:hover) {
-  overflow-x: hidden;
+  // menu縮排
+  .menu-fold:not(:hover) {
+    overflow-x: hidden;
 
-  .logo {
-    display: none;
-  }
+    .logo {
+      display: none;
+    }
 
-  .logo-sm {
-    display: flex;
-    justify-content: center;
+    .logo-sm {
+      display: flex;
+      justify-content: center;
 
-    // 圖示logo
-    .img {
-      width: 30px;
-      height: 30px;
-      margin: 10px;
+      // 圖示logo
+      .img {
+        width: 30px;
+        height: 30px;
+        margin: 10px;
+      }
+    }
+
+    // 隱藏文字
+    ::v-deep(.p-menuitem-text) {
+      display: none;
     }
   }
 
-  // 隱藏文字
-  ::v-deep(.p-menuitem-text) {
+  // 文字logo
+  .logo {
+    display: flex;
+    justify-content: center;
+    margin: 20px;
+
+    img {
+      height: 60px;
+    }
+  }
+
+  // 圖示logo
+  .logo-sm {
     display: none;
   }
-}
 
-// 文字logo
-.logo {
-  display: flex;
-  justify-content: center;
-  margin: 20px;
+  .list {
 
-  img {
-    height: 60px;
-  }
-}
+    // ::v-deep(.p-panelmenu .p-panelmenu-panel) {
+    //   box-shadow: none;
+    // }
 
-// 圖示logo
-.logo-sm {
-  display: none;
-}
+    // 標題預設
+    ::v-deep(.p-panelmenu .p-panelmenu-header .p-panelmenu-header-content .p-panelmenu-header-action) {
+      background-color: rgb(0, 0, 0, 0);
+      color: #b8c7ce;
+      padding: 0.9rem 1.2rem;
+    }
 
-.list {
-  width: 230px;
+    // 標題移入
+    // ::v-deep(.p-panelmenu .p-panelmenu-header:not(.p-highlight):not(.p-disabled) > a:hover) {
+    //   background-color: #1c1f26;
+    //   color: #fff;
+    // }
 
-  ::v-deep(.p-panelmenu .p-panelmenu-panel) {
-    box-shadow: none;
-  }
+    // 展開細項後移入標題
+    // ::v-deep(.p-panelmenu .p-panelmenu-header.p-highlight:not(.p-disabled) > a:hover) {
+    //   background-color: #31343d;
+    //   color: #fff;
+    // }
 
-  // 標題預設
-  ::v-deep(.p-panelmenu .p-panelmenu-header > a) {
-    background-color: rgb(0, 0, 0, 0);
-    color: #b8c7ce;
-    padding: 0.9rem 1.2rem;
-  }
+    // 標題焦點
+    // ::v-deep(.p-panelmenu .p-panelmenu-panel .p-panelmenu-header .p-panelmenu-header-link:focus) {
+    //   background-color: #1c1f26;
+    //   color: #fff;
+    // }
 
-  // 標題移入
-  ::v-deep(.p-panelmenu .p-panelmenu-header:not(.p-highlight):not(.p-disabled) > a:hover) {
-    background-color: #1C1F26;
-    color: #fff;
-  }
+    // 細項
+    // ::v-deep(.p-panelmenu .p-panelmenu-content) {
+    //   padding: 0px;
+    //   background-color: #3d5488;
+    // }
 
-  // 展開細項後移入標題
-  ::v-deep(.p-panelmenu .p-panelmenu-header.p-highlight:not(.p-disabled) > a:hover) {
-    background-color: #31343D;
-    color: #fff;
-  }
+    // 細項容器
+    // ::v-deep(.p-panelmenu .p-panelmenu-content .p-menuitem .p-menuitem-link) {
+    //   padding: 0.9rem 2.2rem;
+    // }
 
-  // 標題焦點
-  ::v-deep(.p-panelmenu .p-panelmenu-panel .p-panelmenu-header .p-panelmenu-header-link:focus) {
-    background-color: #1C1F26;
-    color: #fff;
-  }
+    // 細項移入
+    // ::v-deep(.p-menuitem .p-menuitem-link:not(.p-disabled):hover) {
+    //   background-color: #1e282c;
+    // }
 
-  // 細項
-  ::v-deep(.p-panelmenu .p-panelmenu-content) {
-    padding: 0px;
-    background-color: #3D5488;
-  }
+    // 細項文字
+    // ::v-deep(.p-menuitem .p-menuitem-link .p-menuitem-text) {
+    //   color: #b8c7ce;
+    // }
 
-  // 細項容器
-  ::v-deep(.p-panelmenu .p-panelmenu-content .p-menuitem .p-menuitem-link) {
-    padding: 0.9rem 2.2rem;
-  }
-
-  // 細項移入
-  ::v-deep(.p-menuitem .p-menuitem-link:not(.p-disabled):hover) {
-    background-color: #1e282c;
-  }
-
-  // 細項文字
-  ::v-deep(.p-menuitem .p-menuitem-link .p-menuitem-text) {
-    color: #b8c7ce;
-  }
-
-  // 細項文字移入
-  ::v-deep(.p-menuitem-link:not(.p-disabled):hover .p-menuitem-text) {
-    color: #fff !important;
+    // 細項文字移入
+    // ::v-deep(.p-menuitem-link:not(.p-disabled):hover .p-menuitem-text) {
+    //   color: #fff !important;
+    // }
   }
 }
 </style>

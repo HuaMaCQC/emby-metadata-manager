@@ -1,57 +1,72 @@
 <template>
   <div class="anime-meta-data">
-    <div>
-      <InputSwitch v-model="showAll" />
+    <div class="tool">
       <Button v-is-Loading="loading" class="p-button-raised btn p-button-plain" @click="init">重新整理</Button>
-    </div>
 
-    <div class="remind">
-      <p>動漫數: {{ total }}</p>
+      <div class="show-all">
+        <h5>顯示全部標籤</h5>
+        <InputSwitch v-model="showAll" />
+      </div>
+
+      <div class="remind">
+        <p>動漫數: {{ total }}</p>
+      </div>
     </div>
 
     <DataTable :value="data" responsiveLayout="scroll" :resizableColumns="true" :autoLayout="true" :scrollable="false">
-      <Column field="Name" header="類型名稱"></Column>
+      <Column field="Name" header="動漫名稱"></Column>
 
       <Column header="風格">
         <template #body="slotProps">
-          <div v-if="!showAll" class="genres-sm">
-            <div v-for="item in slotProps.data.GenreItems" :key="item.Id">
-              <Tag severity="info" :rounded="true" :value="item.Name" />
+          <div class="data-setting">
+            <div v-if="!showAll" class="genres-sm">
+              <div v-for="item in slotProps.data.GenreItems" :key="item.Id">
+                <Tag severity="info" :rounded="true" :value="item.Name" />
+              </div>
+            </div>
+
+            <div v-if="showAll" class="genres">
+              <div v-for="option of genresOption" :key="option" class="field-checkbox" :style="{ marginLeft: '10px', paddingTop: '3px' }">
+                <Checkbox :value="option" v-model="slotProps.data.Genres" @click="() => clickCheckbox(slotProps)" />
+                <label :style="{ marginLeft: '7px' }">{{ option }}</label>
+              </div>
             </div>
             <Button icon="pi pi-plus" class="p-button-sm p-button-rounded" @click="() => openEditGenres(slotProps.data)" />
           </div>
-
-          <div v-if="showAll" class="genres">
-            <div v-for="option of genresOption" :key="option" class="field-checkbox" :style="{ marginLeft: '10px', paddingTop: '3px' }">
-              <Checkbox :value="option" v-model="slotProps.data.Genres" />
-              <label :style="{ marginLeft: '7px' }">{{ option }}</label>
-            </div>
-          </div>
-
         </template>
       </Column>
 
       <Column header="標籤">
         <template #body="slotProps">
-          <div v-if="!showAll" class="tag-sm">
-            <div v-for="item in slotProps.data.TagItems" :key="item.Id">
-              <Tag severity="info" :rounded="true" :value="item.Name" />
+          <div class="data-setting">
+            <div v-if="!showAll" class="tag-sm">
+              <div v-for="item in slotProps.data.TagItems" :key="item.Id">
+                <Tag severity="info" :rounded="true" :value="item.Name" />
+              </div>
             </div>
-            <Button icon="pi pi-plus" class="p-button-sm p-button-rounded" @click="() => openEditTags(slotProps.data)" />
-          </div>
 
-          <div v-if="showAll" class="tag">
-            <div v-for="option of tagsOption" :key="option" class="field-checkbox" :style="{ marginLeft: '10px', paddingTop: '3px' }">
-              <Checkbox :value="option" v-model="slotProps.data.Tag" />
-              <label :style="{ marginLeft: '7px' }">{{ option }}</label>
+            <div v-if="showAll" class="tag">
+              <div v-for="option of tagsOption" :key="option" class="field-checkbox" :style="{ marginLeft: '10px', paddingTop: '3px' }">
+                <Checkbox :value="option" v-model="slotProps.data.Tags" @click="() => clickCheckbox(slotProps)" />
+                <label :style="{ marginLeft: '7px' }">{{ option }}</label>
+              </div>
             </div>
+
+            <Button icon="pi pi-plus" class="p-button-sm p-button-rounded" @click="() => openEditTags(slotProps.data)" />
           </div>
         </template>
       </Column>
 
       <Column header="操作">
         <template #body="slotProps">
-          <Button icon="pi" class="p-button-rounded p-button-success" @click="() => saveModal(slotProps.data.Id)"> 保存 </Button>
+          <Button
+            icon="pi"
+            class="p-button-rounded p-button-success"
+            :disabled="slotProps.data.saveBtnDisabled"
+            @click="() => save(slotProps.data, slotProps.index)"
+          >
+            保存
+          </Button>
         </template>
       </Column>
     </DataTable>
@@ -83,7 +98,7 @@
 
 <script setup>
 import useAjax from '@/utils/useAjax';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
@@ -94,9 +109,11 @@ import Dialog from 'primevue/dialog';
 import Checkbox from 'primevue/checkbox';
 import InputText from 'primevue/inputtext';
 import InputSwitch from 'primevue/inputswitch';
+import { useStore } from 'vuex';
 
 const { get, post, getSeriesItem } = useAjax();
-const showAll = ref(true);
+const store = useStore();
+const showAll = ref(!!store.state.setting?.genreTagMetadataShowAll);
 const total = ref(0);
 const data = ref([]);
 const toast = useToast();
@@ -118,7 +135,7 @@ const getSeries = async () => {
   const ItemsRes = await get('/emby/Items', {
     IncludeItemTypes: 'Series',
     Recursive: 'true',
-    Fields: 'Genres,Tags,Taglines',
+    Fields: 'Genres,Tags',
   });
 
   if (!ItemsRes || !ItemsRes.Items) {
@@ -131,7 +148,7 @@ const getSeries = async () => {
     return;
   }
 
-  data.value = ItemsRes.Items.map((d) => ({ ...d, remark: d.Taglines[0] }));
+  data.value = ItemsRes.Items.map((v) => ({ ...v, Tags: v.TagItems.map((t) => t.Name), saveBtnDisabled: true }));
   total.value = ItemsRes.TotalRecordCount;
   loading.value = false;
 };
@@ -176,6 +193,10 @@ const getTagsOption = async () => {
   tagsOption.value = res.Items.map((g) => g.Name);
 };
 
+const clickCheckbox = (d) => {
+  data.value[d.index].saveBtnDisabled = false;
+};
+
 const addOption = () => {
   if (!addOptionValue.value) {
     return;
@@ -188,6 +209,7 @@ const addOption = () => {
       life: 3000,
     });
 
+    editData.value.values = [...editData.value.values, addOptionValue.value];
     return;
   }
 
@@ -236,6 +258,23 @@ const saveModal = async (id) => {
   });
 };
 
+const save = async (vData, index) => {
+  const d = await getSeriesItem(vData.Id);
+  const newData = { ...d, Tags: vData.Tags, Genres: vData.Genres };
+
+  await post(`/emby/Items/${vData.Id}`, newData, {
+    reqformat: 'json',
+  }).then(() => {
+    data.value[index].saveBtnDisabled = true;
+
+    toast.add({
+      severity: 'success',
+      detail: '儲存成功`',
+      life: 3000,
+    });
+  });
+};
+
 const openEditGenres = async (vData) => {
   editData.value = {
     header: `編輯 ${vData.Name} 的風格`,
@@ -262,6 +301,12 @@ const openEditTags = async (vData) => {
   displayEditModal.value = true;
 };
 
+watch(showAll, () => {
+  store.dispatch('changeSetting', {
+    genreTagMetadataShowAll: showAll.value,
+  });
+});
+
 onMounted(() => {
   init();
 });
@@ -271,29 +316,39 @@ onMounted(() => {
 .anime-meta-data {
   height: 100%;
 
-  ::v-deep(.btn) {
-    margin-bottom: 10px;
-  }
-
-  .remind {
+  .tool {
     display: flex;
     justify-content: space-between;
-    padding: 10px;
-  }
+    align-items: center;
 
-  ::v-deep(.taglines) {
-    display: flex;
-    // flex-direction: column;
-    align-items: flex-end;
+    .show-all {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
 
-    .p-button {
-      margin-left: -18px;
-      margin-bottom: -10px;
+      ::v-deep(.p-inputswitch) {
+        margin-left: 5px;
+      }
+    }
+    .remind {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
     }
   }
 
-  ::v-deep(.genres),
-  ::v-deep(.tag) {
+  .data-setting{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+    ::v-deep(.p-button){
+      margin-left: 10px;
+    }
+  }
+
+  .genres-sm,
+  .tag-sm {
     display: flex;
     height: 100%;
     flex-wrap: wrap;
@@ -302,6 +357,13 @@ onMounted(() => {
       margin-right: 5px;
       margin-top: 5px;
     }
+  }
+
+  ::v-deep(.genres),
+  ::v-deep(.tag) {
+    display: flex;
+    height: 100%;
+    flex-wrap: wrap;
   }
 }
 </style>

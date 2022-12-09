@@ -11,6 +11,18 @@ export const logout = ({ commit }) => {
   commit('receiveUser', { id: null, name: null, token: null });
 };
 
+export const changeSetting = ({ commit, state }, setting) => {
+  const newSetting = {
+    ...state.setting,
+    ...setting,
+  };
+
+  console.log(newSetting);
+
+  localStorage.setItem('setting', JSON.stringify(newSetting));
+  commit('receiveSetting', newSetting);
+};
+
 // 登入
 export const login = ({ commit }, { token, user }) => {
   const json = JSON.stringify({
