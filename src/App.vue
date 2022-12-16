@@ -3,7 +3,7 @@
     <router-view />
   </div>
 
-  <Message style="position: fixed;z-index: 1002;bottom: 0px;">
+  <Message style="position: fixed; z-index: 1002; bottom: 0px">
     目前未完成帳密登入程序，如果要在公用電腦使用請用無痕模式! 請勿留下網址位置。
   </Message>
 </template>
@@ -37,29 +37,22 @@ onMounted(() => {
 });
 </script>
 <style lang="scss">
-// #app {
-//   font-family: Papyrus, Verdana, Comic Sans MS ;
-//   -webkit-font-smoothing: antialiased;
-//   -moz-osx-font-smoothing: grayscale;
-// }
+body {
+  overflow: overlay;
 
-// body {
-//   overflow: overlay;
-//   padding-right: 1rem;
-
-//   &::-webkit-scrollbar-button {
-//     background: transparent;
-//     border-radius: 4px;
-//   }
-//   &::-webkit-scrollbar-track-piece {
-//     background: transparent;
-//   }
-//   &::-webkit-scrollbar-thumb {
-//     border-radius: 4px;
-//     background-color: rgb(0, 0, 0, 0.2);
-//   }
-//   &::-webkit-scrollbar-track {
-//     box-shadow: transparent;
-//   }
-// }
+  &::-webkit-scrollbar-button {
+    background: transparent;
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-track-piece {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgb(0, 0, 0, 0.2);
+  }
+  &::-webkit-scrollbar-track {
+    box-shadow: transparent;
+  }
+}
 </style>

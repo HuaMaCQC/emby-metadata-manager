@@ -94,8 +94,7 @@ const items = ref([
 .menu {
   @media (max-width: 1040px) {
     &:not(:hover) {
-      overflow-x: hidden;
-      overflow-y: hidden;
+      overflow: hidden;
       width: 56px;
 
       .logo {
@@ -168,57 +167,28 @@ const items = ref([
     // ::v-deep(.p-panelmenu .p-panelmenu-panel) {
     //   box-shadow: none;
     // }
+    ::v-deep(.p-panelmenu .p-panelmenu-header .p-panelmenu-header-content) {
+      background-color: #3D5488;
+      box-shadow: none;
+      border: none;
+      border-radius: 0px;
 
-    // 標題預設
-    ::v-deep(.p-panelmenu .p-panelmenu-header .p-panelmenu-header-content .p-panelmenu-header-action) {
-      background-color: rgb(0, 0, 0, 0);
-      color: #b8c7ce;
-      padding: 0.9rem 1.2rem;
+      &:hover{
+        background-color: #253252;
+
+      }
+
+      // 標題預設
+      .p-panelmenu-header-action {
+        background-color: rgb(0, 0, 0, 0);
+        color: #b8c7ce;
+        padding: 0.9rem 1.2rem;
+      }
     }
 
-    // 標題移入
-    // ::v-deep(.p-panelmenu .p-panelmenu-header:not(.p-highlight):not(.p-disabled) > a:hover) {
-    //   background-color: #1c1f26;
-    //   color: #fff;
-    // }
-
-    // 展開細項後移入標題
-    // ::v-deep(.p-panelmenu .p-panelmenu-header.p-highlight:not(.p-disabled) > a:hover) {
-    //   background-color: #31343d;
-    //   color: #fff;
-    // }
-
-    // 標題焦點
-    // ::v-deep(.p-panelmenu .p-panelmenu-panel .p-panelmenu-header .p-panelmenu-header-link:focus) {
-    //   background-color: #1c1f26;
-    //   color: #fff;
-    // }
-
-    // 細項
-    // ::v-deep(.p-panelmenu .p-panelmenu-content) {
-    //   padding: 0px;
-    //   background-color: #3d5488;
-    // }
-
-    // 細項容器
-    // ::v-deep(.p-panelmenu .p-panelmenu-content .p-menuitem .p-menuitem-link) {
-    //   padding: 0.9rem 2.2rem;
-    // }
-
-    // 細項移入
-    // ::v-deep(.p-menuitem .p-menuitem-link:not(.p-disabled):hover) {
-    //   background-color: #1e282c;
-    // }
-
-    // 細項文字
-    // ::v-deep(.p-menuitem .p-menuitem-link .p-menuitem-text) {
-    //   color: #b8c7ce;
-    // }
-
-    // 細項文字移入
-    // ::v-deep(.p-menuitem-link:not(.p-disabled):hover .p-menuitem-text) {
-    //   color: #fff !important;
-    // }
+    ::v-deep(.p-panelmenu .p-panelmenu-header.p-highlight .p-panelmenu-header-content){
+      background-color: #253252;
+    }
   }
 }
 </style>
